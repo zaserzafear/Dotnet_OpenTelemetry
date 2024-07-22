@@ -1,0 +1,23 @@
+version: '3.4'
+
+services:
+  aspire-dashboard:
+    image: mcr.microsoft.com/dotnet/aspire-dashboard:8.0.0
+    environment:
+      - DOTNET_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS=true
+    ports:
+      - "18888:18888"
+      - "4317:18889"
+
+  myapp1:
+    image: ${DOCKER_REGISTRY-}myapp1
+    build:
+      context: .
+      dockerfile: MyApp1/Dockerfile
+
+  myapp2:
+    image: ${DOCKER_REGISTRY-}myapp2
+    build:
+      context: .
+      dockerfile: MyApp2/Dockerfile
+
