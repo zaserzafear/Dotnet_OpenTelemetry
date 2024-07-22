@@ -1,3 +1,9 @@
+using OpenTelemetry;
+using OpenTelemetry.Metrics;
+using OpenTelemetry.Trace;
+using Services.Extensions;
+using System.Diagnostics;
+using System.Reflection;
 
 namespace MyApp2
 {
@@ -6,6 +12,37 @@ namespace MyApp2
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+            builder.Logging.AddOpenTelemetry(logging =>
+            {
+                logging.IncludeFormattedMessage = true;
+                logging.IncludeScopes = true;
+            });
+
+            builder.Services.AddOpenTelemetry()
+                .WithMetrics(metrics =>
+                {
+                    metrics.AddRuntimeInstrumentation()
+                        .AddMeter("Microsoft.AspNetCore.Hosting")
+                        .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
+                        .AddMeter("System.Net.Http");
+                })
+                .WithTracing(tracing =>
+                {
+                    tracing.AddAspNetCoreInstrumentation()
+                        .AddHttpClientInstrumentation();
+                });
+
+            var useOtlpExporter = !string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]);
+            string OtlserviceName = builder.Configuration["OTEL_SERVICE_NAME"]
+                ?? Assembly.GetExecutingAssembly().GetName().Name!;
+            if (useOtlpExporter)
+            {
+                builder.Services.AddOpenTelemetry().UseOtlpExporter();
+            }
+
+            builder.Services.AddSingleton(new ActivitySource(OtlserviceName));
+
+            builder.Services.AddServicesLayers();
 
             // Add services to the container.
 
