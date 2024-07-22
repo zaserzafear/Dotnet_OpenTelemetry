@@ -21,15 +21,16 @@ namespace MyApp2
             builder.Services.AddOpenTelemetry()
                 .WithMetrics(metrics =>
                 {
-                    metrics.AddRuntimeInstrumentation()
-                        .AddMeter("Microsoft.AspNetCore.Hosting")
-                        .AddMeter("Microsoft.AspNetCore.Server.Kestrel")
-                        .AddMeter("System.Net.Http");
+                    metrics
+                    .AddAspNetCoreInstrumentation()
+                    .AddHttpClientInstrumentation()
+                    .AddRuntimeInstrumentation();
                 })
                 .WithTracing(tracing =>
                 {
-                    tracing.AddAspNetCoreInstrumentation()
-                        .AddHttpClientInstrumentation();
+                    tracing
+                    .AddAspNetCoreInstrumentation()
+                    .AddHttpClientInstrumentation();
                 });
 
             var useOtlpExporter = !string.IsNullOrWhiteSpace(builder.Configuration["OTEL_EXPORTER_OTLP_ENDPOINT"]);
