@@ -11,13 +11,19 @@ namespace Services.Extensions
     {
         public static IServiceCollection AddMassTransitExtension(this IServiceCollection services, IConfiguration configuration)
         {
+            var featureConfig = configuration.GetSection("FeatureConfiguration");
+
             services.AddMassTransit(x =>
             {
                 var rabbitMqSetting = configuration.GetSection("RabbitMQ").Get<RabbitMQOptions>()!;
 
                 x.SetKebabCaseEndpointNameFormatter();
 
-                x.AddConsumer<AuthServiceConsumer>();
+                var consumersSection = featureConfig.GetSection("Consumers");
+                if (consumersSection.GetValue<bool>("Auth"))
+                {
+                    x.AddConsumer<AuthServiceConsumer>();
+                }
 
                 x.UsingRabbitMq((context, cfg) =>
                 {
@@ -33,18 +39,24 @@ namespace Services.Extensions
                         });
                     });
 
-                    cfg.ReceiveEndpoint("auth_request_queue", e =>
+                    if (consumersSection.GetValue<bool>("Auth"))
                     {
-                        e.ConfigureConsumer<AuthServiceConsumer>(context);
-                        e.PrefetchCount = rabbitMqSetting.AuthRequest.PrefetchCount;
-                        e.ConcurrentMessageLimit = rabbitMqSetting.AuthRequest.ConcurrentMessageLimit;
-                    });
+                        cfg.ReceiveEndpoint("auth_request_queue", e =>
+                        {
+                            e.ConfigureConsumer<AuthServiceConsumer>(context);
+                            e.PrefetchCount = rabbitMqSetting.AuthRequest.PrefetchCount;
+                            e.ConcurrentMessageLimit = rabbitMqSetting.AuthRequest.ConcurrentMessageLimit;
+                        });
+                    }
 
                 });
             });
 
-
-            services.AddScoped<IAuthServicePublisher, AuthServicePublisher>();
+            var publishersSection = featureConfig.GetSection("Publishers");
+            if (publishersSection.GetValue<bool>("Auth"))
+            {
+                services.AddScoped<IAuthServicePublisher, AuthServicePublisher>();
+            }
 
             return services;
         }
