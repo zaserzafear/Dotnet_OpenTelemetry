@@ -1,6 +1,6 @@
-﻿namespace MyApp1.Models
+﻿namespace MyApp1.Configuration
 {
-    public class MyApp2Settings
+    public class MyApp2Options
     {
         private string _baseUrl = string.Empty;
         private int _timeout = 30;

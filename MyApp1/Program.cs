@@ -1,4 +1,4 @@
-using MyApp1.Models;
+using MyApp1.Configuration;
 using MyApp1.Services;
 using Services.Extensions;
 
@@ -20,7 +20,7 @@ namespace MyApp1
             builder.Services.AddSingleton<MyApp2Client>();
 
             // Configure settings for MyApp2
-            builder.Services.Configure<MyApp2Settings>(builder.Configuration.GetSection("MyApp2"));
+            builder.Services.Configure<MyApp2Options>(builder.Configuration.GetSection("MyApp2"));
 
 
             // Add services to the container.

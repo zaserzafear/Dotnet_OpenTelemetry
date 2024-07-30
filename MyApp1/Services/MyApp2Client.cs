@@ -1,5 +1,5 @@
 ﻿using Microsoft.Extensions.Options;
-using MyApp1.Models;
+using MyApp1.Configuration;
 using System.Diagnostics;
 
 namespace MyApp1.Services
@@ -8,10 +8,10 @@ namespace MyApp1.Services
     {
         private readonly ILogger<MyApp2Client> _logger;
         private readonly HttpClient _httpClient;
-        private readonly MyApp2Settings _settings;
+        private readonly MyApp2Options _settings;
         private readonly ActivitySource _activitySource;
 
-        public MyApp2Client(ILogger<MyApp2Client> logger, HttpClient httpClient, IOptions<MyApp2Settings> settings, ActivitySource activitySource)
+        public MyApp2Client(ILogger<MyApp2Client> logger, HttpClient httpClient, IOptions<MyApp2Options> settings, ActivitySource activitySource)
         {
             _logger = logger;
             _httpClient = httpClient;
