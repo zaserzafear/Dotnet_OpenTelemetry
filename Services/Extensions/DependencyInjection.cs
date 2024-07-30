@@ -10,10 +10,11 @@ namespace Services.Extensions
         public static IServiceCollection AddServicesLayers(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddOpenTelemetryExtensions(configuration);
-            services.AddTransient<IAuthService, AuthService>();
+            services.AddMassTransitExtension(configuration);
+
+            services.AddScoped<IAuthService, AuthService>();
 
             return services;
         }
-
     }
 }

@@ -76,7 +76,8 @@ namespace Extensions
                 {
                     tracing
                         .AddAspNetCoreInstrumentation()     // Instrumentation for ASP.NET Core
-                        .AddHttpClientInstrumentation();    // Instrumentation for HttpClient
+                        .AddHttpClientInstrumentation()     // Instrumentation for HttpClient
+                        .AddSource("MassTransit");
                 });
         }
 
