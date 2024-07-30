@@ -9,6 +9,7 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
 COPY ["MyApp2/MyApp2.csproj", "MyApp2/"]
+COPY ["Extensions/Extensions.csproj", "Extensions/"]
 COPY ["Services/Services.csproj", "Services/"]
 RUN dotnet restore "./MyApp2/./MyApp2.csproj"
 COPY . .

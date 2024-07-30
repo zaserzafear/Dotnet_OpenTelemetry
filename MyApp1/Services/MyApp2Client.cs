@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Options;
 using MyApp1.Models;
 using System.Diagnostics;
-using System.Diagnostics.Metrics;
 
 namespace MyApp1.Services
 {
@@ -11,15 +10,13 @@ namespace MyApp1.Services
         private readonly HttpClient _httpClient;
         private readonly MyApp2Settings _settings;
         private readonly ActivitySource _activitySource;
-        private readonly Counter<int> _endpointCounter;
 
-        public MyApp2Client(ILogger<MyApp2Client> logger, HttpClient httpClient, IOptions<MyApp2Settings> settings, ActivitySource activitySource, Meter meter)
+        public MyApp2Client(ILogger<MyApp2Client> logger, HttpClient httpClient, IOptions<MyApp2Settings> settings, ActivitySource activitySource)
         {
             _logger = logger;
             _httpClient = httpClient;
             _settings = settings.Value;
             _activitySource = activitySource;
-            _endpointCounter = meter.CreateCounter<int>("endpoint_calls");
 
             _httpClient.Timeout = TimeSpan.FromSeconds(_settings.Timeout);
         }
@@ -43,8 +40,6 @@ namespace MyApp1.Services
             {
                 _logger.LogInformation("Sending request to {Endpoint}", endpoint);
                 var response = await _httpClient.SendAsync(request);
-
-                _endpointCounter.Add(1, new KeyValuePair<string, object>("endpoint", endpoint));
 
                 if (response.IsSuccessStatusCode)
                 {
